@@ -1,29 +1,22 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-js" // 👈 กลับมาใช้ค่ามาตรฐาน
 }
 
 datasource db {
   provider = "postgresql"
-  // เนื่องจากเราใช้ prisma.config.ts ใน Prisma v7+ ตรงนี้ใช้ env() ตามปกติครับ
 }
 
-// 1. สร้างตารางหมวดหมู่ (Category)
 model Category {
   id       Int       @id @default(autoincrement())
   name     String
-  // 1 หมวดหมู่ มีสินค้าได้หลายชิ้น (Products)
   products Product[]
 }
 
-// 2. อัปเดตตารางสินค้า (Product) ให้มีหมวดหมู่
 model Product {
-  id     Int      @id @default(autoincrement())
-  name   String
-  price  Float
-  create DateTime @default(now())
-
-  // เพิ่ม 2 บรรทัดนี้เพื่อเชื่อมความสัมพันธ์:
-  // (ใส่เครื่องหมาย ? ไว้เพื่อให้เป็น Optional ก่อน ป้องกัน Error กับสินค้าเก่าที่ไม่มีหมวดหมู่ครับ)
+  id         Int       @id @default(autoincrement())
+  name       String
+  price      Float
+  create     DateTime  @default(now())
   categoryId Int?
   category   Category? @relation(fields: [categoryId], references: [id])
 }
