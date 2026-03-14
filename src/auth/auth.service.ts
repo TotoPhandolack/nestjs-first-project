@@ -6,11 +6,15 @@ import {
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { PrismaService } from '../prisma/prisma.service'; // นำเข้า Prisma
 import * as bcrypt from 'bcrypt'; // นำเข้าเครื่องมือเข้ารหัส
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   // ดึง PrismaService มาใช้งาน
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private JwtService: JwtService,
+  ) {}
 
   // เปลี่ยนชื่อฟังก์ชันจาก create เป็น register เพื่อความเข้าใจง่าย
   async register(createAuthDto: CreateAuthDto) {
@@ -64,15 +68,14 @@ export class AuthService {
       throw new UnauthorizedException('อีเมลหรือรหัสผ่านไม่ถูกต้องครับ!');
     }
 
+    const paylaod = { id: user.id, email: user.email };
+
+    const accessToken = await this.JwtService.signAsync(paylaod);
+
     // ถ้าเข้ารหัสได้สำเร็จ ให้ส่งข้อมูลผู้ใช้กลับไป
     return {
       message: 'เข้าสู่ระบบสำเร็จ! 🎉',
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        createdAt: user.createdAt,
-      },
+      access_token: accessToken,
     };
   }
 
