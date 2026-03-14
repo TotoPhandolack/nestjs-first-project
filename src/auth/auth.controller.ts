@@ -1,6 +1,7 @@
-import { Controller, Post, Get, Body } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -21,5 +22,14 @@ export class AuthController {
   async findAll(): Promise<any> {
     // 👈 เติม : Promise<any> บอกว่าเดี๋ยวจะส่งข้อมูลอะไรบางอย่างกลับไปนะ
     return await this.authService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Req() req: any) {
+    return {
+      message: 'ยินดีต้อนรับสู่โซน VIP! นี่คือข้อมูลโปรไฟล์ของคุณ',
+      user: req.user,
+    };
   }
 }
